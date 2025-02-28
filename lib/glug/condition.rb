@@ -1,5 +1,4 @@
 module Glug # :nodoc:
-
   # -----	Subscriptable
   #       allows us to create conditions with syntax
   #         any[(highway=='primary'),(highway=='trunk')]
@@ -8,6 +7,7 @@ module Glug # :nodoc:
     def initialize(type)
       @type = type
     end
+
     def [](*arguments)
       Condition.new.from_list(@type, arguments)
     end
@@ -59,16 +59,19 @@ module Glug # :nodoc:
     def initialize
       @values = []
     end
+
     def from_key(operator, key, list)
       @operator = SUBSTITUTIONS[operator] || operator.to_s.gsub('_', '-')
       @values = [key].concat(list)
       self
     end
+
     def from_list(operator, list)
       @operator = SUBSTITUTIONS[operator] || operator.to_s.gsub('_', '-')
       @values = list
       self
     end
+
     def just_value(val)
       @operator = nil
       @values = [val]
@@ -77,6 +80,7 @@ module Glug # :nodoc:
 
     def &(cond); merge(:all, cond) end
     def |(cond); merge(:any, cond) end
+
     def merge(op, cond)
       if cond.nil?
         self
@@ -88,6 +92,7 @@ module Glug # :nodoc:
         Condition.new.from_list(op, [self, cond])
       end
     end
+
     def <<(cond); @values << cond.encode; self end
 
     # Support dot access for most methods
@@ -105,9 +110,11 @@ module Glug # :nodoc:
       values = @values.map { |v| v.is_a?(Condition) ? v.encode : v }
       @operator.nil? ? values[0] : [@operator.to_s, *values]
     end
+
     def to_json(opts)
       encode.to_json(opts)
     end
+
     def to_s
       "<Condition #{@operator} #{@values}>"
     end

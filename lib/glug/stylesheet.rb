@@ -1,5 +1,4 @@
 module Glug # :nodoc:
-
   # -----	Stylesheet
   #       the main document object
 
@@ -42,6 +41,7 @@ module Glug # :nodoc:
       out['layers'] = @layers.select { |r| r.write? }.collect { |r| r.to_hash }.compact
       out
     end
+
     def to_json(*args); JSON.neat_generate(to_hash) end
 
     # Setter for Layer to add sublayers

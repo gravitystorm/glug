@@ -1,51 +1,49 @@
 module Glug # :nodoc:
-
   # -----	Layer
   #       a layer in a GL style
   #       this is where most of the hard work happens, including 'method_missing' and 'on' calls to provide the grammar
 
   class Layer
-
     # GL properties (as distinct from OSM keys)
     LAYOUT    = [:visibility,
-                  :line_cap, :line_join, :line_miter_limit, :line_round_limit,
-                  :symbol_placement, :symbol_spacing, :symbol_avoid_edges, :symbol_z_order,
-                  :icon_allow_overlap, :icon_ignore_placement, :icon_optional, :icon_rotation_alignment, :icon_size,
-                  :icon_image, :icon_rotate, :icon_padding, :icon_keep_upright, :icon_offset,
-                  :icon_text_fit, :icon_text_fit_padding, :icon_anchor, :icon_pitch_alignment,
-                  :text_rotation_alignment, :text_field, :text_font, :text_size, :text_max_width, :text_line_height,
-                  :text_letter_spacing, :text_justify, :text_anchor, :text_max_angle, :text_rotate, :text_padding,
-                  :text_keep_upright, :text_transform, :text_offset, :text_allow_overlap, :text_ignore_placement, :text_optional,
-                  :text_pitch_alignment]
+                 :line_cap, :line_join, :line_miter_limit, :line_round_limit,
+                 :symbol_placement, :symbol_spacing, :symbol_avoid_edges, :symbol_z_order,
+                 :icon_allow_overlap, :icon_ignore_placement, :icon_optional, :icon_rotation_alignment, :icon_size,
+                 :icon_image, :icon_rotate, :icon_padding, :icon_keep_upright, :icon_offset,
+                 :icon_text_fit, :icon_text_fit_padding, :icon_anchor, :icon_pitch_alignment,
+                 :text_rotation_alignment, :text_field, :text_font, :text_size, :text_max_width, :text_line_height,
+                 :text_letter_spacing, :text_justify, :text_anchor, :text_max_angle, :text_rotate, :text_padding,
+                 :text_keep_upright, :text_transform, :text_offset, :text_allow_overlap, :text_ignore_placement, :text_optional,
+                 :text_pitch_alignment]
     PAINT     = [:background_color, :background_pattern, :background_opacity,
-                  :fill_antialias, :fill_opacity, :fill_color, :fill_outline_color, :fill_translate, :fill_translate_anchor, :fill_pattern,
-                  :line_opacity, :line_color, :line_translate, :line_translate_anchor, :line_width, :line_gap_width, :line_offset,
-                  :line_blur, :line_dasharray, :line_pattern, :line_gradient,
-                  :icon_opacity, :icon_color, :icon_halo_color, :icon_halo_width, :icon_halo_blur, :icon_translate, :icon_translate_anchor,
-                  :text_opacity, :text_color, :text_halo_color, :text_halo_width, :text_halo_blur, :text_translate, :text_translate_anchor,
-                  :raster_opacity, :raster_hue_rotate, :raster_brightness_min, :raster_brightness_max, :raster_saturation, :raster_contrast, :raster_resampling, :raster_fade_duration,
-                  :circle_radius, :circle_color, :circle_blur, :circle_opacity, :circle_translate, :circle_translate_anchor,
-                  :circle_pitch_scale, :circle_pitch_alignment, :circle_stroke_width, :circle_stroke_color, :circle_stroke_opacity,
-                  :fill_extrusion_opacity, :fill_extrusion_color, :fill_extrusion_translate, :fill_extrusion_translate_anchor,
-                  :fill_extrusion_pattern, :fill_extrusion_height, :fill_extrusion_base, :fill_extrusion_vertical_gradient,
-                  :heatmap_radius, :heatmap_weight, :heatmap_intensity, :heatmap_color, :heatmap_opacity,
-                  :hillshade_illumination_direction, :hillshade_illumination_anchor, :hillshade_exaggeration,
-                  :hillshade_shadow_color, :hillshade_highlight_color, :hillshade_accent_color]
+                 :fill_antialias, :fill_opacity, :fill_color, :fill_outline_color, :fill_translate, :fill_translate_anchor, :fill_pattern,
+                 :line_opacity, :line_color, :line_translate, :line_translate_anchor, :line_width, :line_gap_width, :line_offset,
+                 :line_blur, :line_dasharray, :line_pattern, :line_gradient,
+                 :icon_opacity, :icon_color, :icon_halo_color, :icon_halo_width, :icon_halo_blur, :icon_translate, :icon_translate_anchor,
+                 :text_opacity, :text_color, :text_halo_color, :text_halo_width, :text_halo_blur, :text_translate, :text_translate_anchor,
+                 :raster_opacity, :raster_hue_rotate, :raster_brightness_min, :raster_brightness_max, :raster_saturation, :raster_contrast, :raster_resampling, :raster_fade_duration,
+                 :circle_radius, :circle_color, :circle_blur, :circle_opacity, :circle_translate, :circle_translate_anchor,
+                 :circle_pitch_scale, :circle_pitch_alignment, :circle_stroke_width, :circle_stroke_color, :circle_stroke_opacity,
+                 :fill_extrusion_opacity, :fill_extrusion_color, :fill_extrusion_translate, :fill_extrusion_translate_anchor,
+                 :fill_extrusion_pattern, :fill_extrusion_height, :fill_extrusion_base, :fill_extrusion_vertical_gradient,
+                 :heatmap_radius, :heatmap_weight, :heatmap_intensity, :heatmap_color, :heatmap_opacity,
+                 :hillshade_illumination_direction, :hillshade_illumination_anchor, :hillshade_exaggeration,
+                 :hillshade_shadow_color, :hillshade_highlight_color, :hillshade_accent_color]
     TOP_LEVEL = [:metadata, :zoom, :interactive]
     HIDDEN    = [:ref, :source, :source_layer, :id, :type, :filter, :layout, :paint]	# top level, not settable by commands
     EXPRESSIONS = [:array, :boolean, :collator, :string_format, :image, :literal, :number,
-                  :number_format, :object, :string, :to_boolean, :to_color, :to_number, :to_string,
-                  :typeof, :accumulated, :feature_state, :geometry_type, :feature_id,
-                  :line_progress, :properties, :at, :get, :has, :is_in, :index_of,
-                  :length, :slice,
-            :all, :any, :case_when, :coalesce, :match, :within,
-            :interpolate, :interpolate_hcl, :interpolate_lab, :step,
-            :let, :var, :concat, :downcase, :upcase,
-            :is_supported_script, :resolved_locale,
-            :rgb, :rgba, :to_rgba, :abs, :acos, :asin, :atan, :ceil, :cos, :distance,
-            :e, :floor, :ln, :ln2, :log10, :log2, :max, :min, :pi, :round, :sin, :sqrt, :tan,
-            :distance_from_center, :pitch, :zoom, :heatmap_density,
-            :subtract, :divide, :pow, :_!]
+                   :number_format, :object, :string, :to_boolean, :to_color, :to_number, :to_string,
+                   :typeof, :accumulated, :feature_state, :geometry_type, :feature_id,
+                   :line_progress, :properties, :at, :get, :has, :is_in, :index_of,
+                   :length, :slice,
+                   :all, :any, :case_when, :coalesce, :match, :within,
+                   :interpolate, :interpolate_hcl, :interpolate_lab, :step,
+                   :let, :var, :concat, :downcase, :upcase,
+                   :is_supported_script, :resolved_locale,
+                   :rgb, :rgba, :to_rgba, :abs, :acos, :asin, :atan, :ceil, :cos, :distance,
+                   :e, :floor, :ln, :ln2, :log10, :log2, :max, :min, :pi, :round, :sin, :sqrt, :tan,
+                   :distance_from_center, :pitch, :zoom, :heatmap_density,
+                   :subtract, :divide, :pow, :_!]
 
     # Shared properties that can be recalled by using a 'ref'
     REF_PROPERTIES = ['type', 'source', 'source-layer', 'minzoom', 'maxzoom', 'filter', 'layout']
@@ -112,8 +110,8 @@ module Glug # :nodoc:
     def on(*args, &block)
       @child_num += 1
       r = Layer.new(@stylesheet,
-          :id => "#{@kv[:id]}__#{@child_num}".to_sym,
-          :kv => @kv.dup, :cascades => @cascades.dup)
+                    :id => "#{@kv[:id]}__#{@child_num}".to_sym,
+                    :kv => @kv.dup, :cascades => @cascades.dup)
 
       # Set zoom level
       if args[0].is_a?(Range) || args[0].is_a?(Integer)
@@ -156,6 +154,7 @@ module Glug # :nodoc:
       self.instance_eval(&block)
       @cascade_cond = nil
     end
+
     def _add_cascade_condition(k, v)
       if @cascades.length > 0 && @cascades[-1][0].to_s == @cascade_cond.to_s
         @cascades[-1][1][k] = v
@@ -163,12 +162,13 @@ module Glug # :nodoc:
         @cascades << [@cascade_cond, { k => v }]
       end
     end
+
     def uncascaded(*args)
       cond = case args.length
-        when 0; nil
-        when 1; args[0]
-        else; Condition.new.from_list(:any, args)
-      end
+             when 0; nil
+             when 1; args[0]
+             else; Condition.new.from_list(:any, args)
+             end
       @uncascaded = cond
     end
 
@@ -176,6 +176,7 @@ module Glug # :nodoc:
     def filter(*args)
       _set_filter(args.length == 1 ? args[0] : Condition.new.from_list(:any, args))
     end
+
     def _set_filter(condition)
       @condition = condition.nil? ? nil : condition.dup
     end
@@ -196,9 +197,11 @@ module Glug # :nodoc:
     # Deduce 'type' attribute from style attributes
     def set_type_from(s)
       return unless s.include?('-')
+
       t = (s =~ /^fill-extrusion/ ? "fill-extrusion" : s.split('-')[0]).to_sym
       if t == :icon || t == :text then t = :symbol end
       if @type && @type != t then raise "Attribute #{s} conflicts with deduced type #{@type} in layer #{@kv[:id]}" end
+
       @type = t
     end
 
@@ -256,6 +259,5 @@ module Glug # :nodoc:
     def ref_key(hash)
       (REF_PROPERTIES.collect { |k| hash[k] }).to_json
     end
-
   end # class Layer
 end # module Glug
