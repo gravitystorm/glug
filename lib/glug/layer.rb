@@ -50,26 +50,26 @@ module Glug # :nodoc:
     # Shared properties that can be recalled by using a 'ref' 
     REF_PROPERTIES = ['type', 'source', 'source-layer', 'minzoom', 'maxzoom', 'filter', 'layout']
 
-    attr_accessor :kv				# key-value pairs for layout, paint, and top level
-    attr_accessor :condition		# filter condition
-    attr_accessor :stylesheet		# parent stylesheet object
+    attr_accessor :kv	# key-value pairs for layout, paint, and top level
+    attr_accessor :condition	# filter condition
+    attr_accessor :stylesheet	# parent stylesheet object
 
-    def initialize(stylesheet, args={})
+    def initialize(stylesheet, args = {})
       @stylesheet = stylesheet
       @condition = args[:condition]
       @kv = args[:kv] || {}
       @kv[:id] = args[:id]
       if args[:zoom] then @kv[:zoom] = args[:zoom] end
 
-      @type = nil							# auto-detected layer type
-      @write = true						# write this layer out, or has it been suppressed?
-      @cascade_cond = nil					# are we currently evaluating a cascade directive?
+      @type = nil	# auto-detected layer type
+      @write = true	# write this layer out, or has it been suppressed?
+      @cascade_cond = nil	# are we currently evaluating a cascade directive?
       @cascades = args[:cascades] || []	# cascade list to apply to all subsequent layers
-      @uncascaded = nil					# condition to add to non-cascaded layers
+      @uncascaded = nil	# condition to add to non-cascaded layers
 
-      @kv[:source] ||= stylesheet.sources.find {|k,v| v[:default] }[0]
+      @kv[:source] ||= stylesheet.sources.find {|k, v| v[:default] }[0]
       @kv[:source_layer] ||= args[:id] if stylesheet.sources[@kv[:source]][:type] == "vector"
-      @child_num = 0				# incremented sublayer suffix
+      @child_num = 0	# incremented sublayer suffix
     end
 
     # Handle all missing 'method' calls
@@ -123,9 +123,9 @@ module Glug # :nodoc:
       # Set condition
       sub_cond = nil
       if args.empty?
-        sub_cond = @condition						# just inherit parent layer's condition
+        sub_cond = @condition	# just inherit parent layer's condition
       else
-        sub_cond = (args.length == 1) ? args[0] : Condition.new.from_list(:any,args)
+        sub_cond = (args.length == 1) ? args[0] : Condition.new.from_list(:any, args)
         sub_cond = nilsafe_merge(sub_cond, @condition)
       end
       r._set_filter(nilsafe_merge(sub_cond, @uncascaded))
@@ -145,13 +145,13 @@ module Glug # :nodoc:
     end
     
     # Nil-safe merge
-    def nilsafe_merge(a,b)
+    def nilsafe_merge(a, b)
       a.nil? ? b : (a & b)
     end
 
     # Add a cascading condition
     def cascade(*args, &block)
-      cond = (args.length == 1) ? args[0] : Condition.new.from_list(:any,args)
+      cond = (args.length == 1) ? args[0] : Condition.new.from_list(:any, args)
       @cascade_cond = cond
       self.instance_eval(&block)
       @cascade_cond = nil
@@ -167,14 +167,14 @@ module Glug # :nodoc:
       cond = case args.length
         when 0; nil
         when 1; args[0]
-        else; Condition.new.from_list(:any,args)
+        else; Condition.new.from_list(:any, args)
       end
       @uncascaded = cond
     end
 
     # Setters for @condition (making sure we copy when inheriting)
     def filter(*args)
-      _set_filter(args.length == 1 ? args[0] : Condition.new.from_list(:any,args))
+      _set_filter(args.length == 1 ? args[0] : Condition.new.from_list(:any, args))
     end
     def _set_filter(condition)
       @condition = condition.nil? ? nil : condition.dup
@@ -190,8 +190,8 @@ module Glug # :nodoc:
     def write?; @write end
 
     # Square-bracket filters (any[...], all[...])
-    def any ; return Subscriptable.new(:any ) end
-    def all ; return Subscriptable.new(:all ) end
+    def any; return Subscriptable.new(:any ) end
+    def all; return Subscriptable.new(:all ) end
 
     # Deduce 'type' attribute from style attributes
     def set_type_from(s)
@@ -207,8 +207,8 @@ module Glug # :nodoc:
       hash = { :layout => {}, :paint => {} }
 
       # Assign key/values to correct place
-      @kv.each do |k,v|
-        s = k.to_s.gsub('_','-')
+      @kv.each do |k, v|
+        s = k.to_s.gsub('_', '-')
         if s.include?('-color') && v.is_a?(Integer) then v = "#%06x" % v end
         if v.respond_to?(:encode) then v = v.encode end
 

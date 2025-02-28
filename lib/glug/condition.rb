@@ -42,17 +42,17 @@ module Glug # :nodoc:
     def is(*args); Condition.new.from_key(:==, self, args) end
     def ==(*args); Condition.new.from_key(:==, self, args) end
     def !=(*args); Condition.new.from_key(:!=, self, args) end
-    def  <(*args); Condition.new.from_key(:< , self, args) end
-    def  >(*args); Condition.new.from_key(:> , self, args) end
+    def  <(*args); Condition.new.from_key(:<, self, args) end
+    def  >(*args); Condition.new.from_key(:>, self, args) end
     def <=(*args); Condition.new.from_key(:<=, self, args) end
     def >=(*args); Condition.new.from_key(:>=, self, args) end
-    def  %(*args); Condition.new.from_key(:% , self, args) end
-    def  +(*args); Condition.new.from_key(:+ , self, args) end
-    def  -(*args); Condition.new.from_key(:- , self, args) end
-    def  *(*args); Condition.new.from_key(:* , self, args) end
-    def  /(*args); Condition.new.from_key(:/ , self, args) end
-    def **(*args); Condition.new.from_key(:^ , self, args) end
-    def in(*args); Condition.new.from_key(:in, self, [[:literal,args.flatten]]) end
+    def  %(*args); Condition.new.from_key(:%, self, args) end
+    def  +(*args); Condition.new.from_key(:+, self, args) end
+    def  -(*args); Condition.new.from_key(:-, self, args) end
+    def  *(*args); Condition.new.from_key(:*, self, args) end
+    def  /(*args); Condition.new.from_key(:/, self, args) end
+    def **(*args); Condition.new.from_key(:^, self, args) end
+    def in(*args); Condition.new.from_key(:in, self, [[:literal, args.flatten]]) end
     def [](*args); Condition.new.from_key(:at, args[0], [self]) end
     def coerce(other); [Condition.new.just_value(other), self] end
 
@@ -60,12 +60,12 @@ module Glug # :nodoc:
       @values = []
     end
     def from_key(operator, key, list)
-      @operator = SUBSTITUTIONS[operator] || operator.to_s.gsub('_','-')
+      @operator = SUBSTITUTIONS[operator] || operator.to_s.gsub('_', '-')
       @values = [key].concat(list)
       self
     end
     def from_list(operator, list)
-      @operator = SUBSTITUTIONS[operator] || operator.to_s.gsub('_','-')
+      @operator = SUBSTITUTIONS[operator] || operator.to_s.gsub('_', '-')
       @values = list
       self
     end
@@ -75,9 +75,9 @@ module Glug # :nodoc:
       self
     end
 
-    def &(cond); merge(:all,cond) end
-    def |(cond); merge(:any,cond) end
-    def merge(op,cond)
+    def &(cond); merge(:all, cond) end
+    def |(cond); merge(:any, cond) end
+    def merge(op, cond)
       if cond.nil?
         self
       elsif @operator == op
@@ -117,7 +117,7 @@ module Glug # :nodoc:
       @values.map! do |v|
         if v.is_a?(Hash)
           new_hash = {}
-          v.each { |hk,hv| new_hash[hk.is_a?(Symbol) ? hk.to_s.gsub('_','-') : hk] = hv }
+          v.each { |hk, hv| new_hash[hk.is_a?(Symbol) ? hk.to_s.gsub('_', '-') : hk] = hv }
           new_hash
         else
           v

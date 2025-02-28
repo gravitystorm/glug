@@ -22,13 +22,13 @@ module Glug # :nodoc:
     end
 
     # Add a source 
-    def source(source_name, opts={})
+    def source(source_name, opts = {})
       @sources[source_name] = opts
     end
 
     # Add a layer
     # creates a new Layer object using the block supplied
-    def layer(id, opts={}, &block)
+    def layer(id, opts = {}, &block)
       r = Layer.new(self, :id => id, :kv => opts)
       @layers << r
       r.instance_eval(&block)
@@ -38,7 +38,7 @@ module Glug # :nodoc:
     def to_hash
       out = @kv.dup
       out['sources'] = @sources.dup
-      out['sources'].each { |k,v| v.delete(:default); out['sources'][k] = v }
+      out['sources'].each { |k, v| v.delete(:default); out['sources'][k] = v }
       out['layers'] = @layers.select { |r| r.write? }.collect { |r| r.to_hash }.compact
       out
     end
