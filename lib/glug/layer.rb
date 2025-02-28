@@ -187,12 +187,12 @@ module Glug # :nodoc:
     end
 
     # Suppress output of this layer
-    def suppress; @write = false end
-    def write?; @write end
+    def suppress = @write = false
+    def write? = @write
 
     # Square-bracket filters (any[...], all[...])
-    def any; Subscriptable.new(:any) end
-    def all; Subscriptable.new(:all) end
+    def any = Subscriptable.new(:any)
+    def all = Subscriptable.new(:all)
 
     # Deduce 'type' attribute from style attributes
     def set_type_from(s)

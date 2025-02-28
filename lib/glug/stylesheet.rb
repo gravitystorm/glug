@@ -45,7 +45,7 @@ module Glug # :nodoc:
       out
     end
 
-    def to_json(*_args); JSON.neat_generate(to_hash) end
+    def to_json(*_args) = JSON.neat_generate(to_hash)
 
     # Setter for Layer to add sublayers
     def _add_layer(layer)
