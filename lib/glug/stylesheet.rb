@@ -28,7 +28,7 @@ module Glug # :nodoc:
     # Add a layer
     # creates a new Layer object using the block supplied
     def layer(id, opts = {}, &block)
-      r = Layer.new(self, :id => id, :kv => opts)
+      r = Layer.new(self, id: id, kv: opts)
       @layers << r
       r.instance_eval(&block)
     end

@@ -110,8 +110,8 @@ module Glug # :nodoc:
     def on(*args, &block)
       @child_num += 1
       r = Layer.new(@stylesheet,
-                    :id => :"#{@kv[:id]}__#{@child_num}",
-                    :kv => @kv.dup, :cascades => @cascades.dup)
+                    id: :"#{@kv[:id]}__#{@child_num}",
+                    kv: @kv.dup, cascades: @cascades.dup)
 
       # Set zoom level
       if args[0].is_a?(Range) || args[0].is_a?(Integer)
@@ -134,7 +134,7 @@ module Glug # :nodoc:
       child_chr = 'a'
       @cascades.each do |c|
         c_cond, c_kv = c
-        l = Layer.new(@stylesheet, :id => "#{r.kv[:id]}__#{child_chr}", :kv => r.kv.dup)
+        l = Layer.new(@stylesheet, id: "#{r.kv[:id]}__#{child_chr}", kv: r.kv.dup)
         l._set_filter(nilsafe_merge(sub_cond, c_cond))
         l.kv.merge!(c_kv)
         @stylesheet._add_layer(l)
@@ -207,7 +207,7 @@ module Glug # :nodoc:
 
     # Create a GL-format hash from a layer definition
     def to_hash
-      hash = { :layout => {}, :paint => {} }
+      hash = { layout: {}, paint: {} }
 
       # Assign key/values to correct place
       @kv.each do |k, v|

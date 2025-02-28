@@ -137,17 +137,6 @@ Style/FrozenStringLiteralComment:
     - 'lib/glug/layer.rb'
     - 'lib/glug/stylesheet.rb'
 
-# Offense count: 10
-# This cop supports safe autocorrection (--autocorrect).
-# Configuration parameters: EnforcedStyle, EnforcedShorthandSyntax, UseHashRocketsWithSymbolValues, PreferHashRocketsForNonAlnumEndingSymbols.
-# SupportedStyles: ruby19, hash_rockets, no_mixed_keys, ruby19_no_mixed_keys
-# SupportedShorthandSyntax: always, never, either, consistent, either_consistent
-Style/HashSyntax:
-  Exclude:
-    - 'Gemfile'
-    - 'lib/glug/layer.rb'
-    - 'lib/glug/stylesheet.rb'
-
 # Offense count: 8
 # This cop supports safe autocorrection (--autocorrect).
 Style/IfUnlessModifier:

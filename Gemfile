@@ -4,4 +4,4 @@ source "https://rubygems.org"
 
 # gem "rails"
 
-gem "rubocop", "~> 1.73", :groups => [:development, :test]
+gem "rubocop", "~> 1.73", groups: [:development, :test]
