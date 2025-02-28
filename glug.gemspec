@@ -8,8 +8,8 @@ Gem::Specification.new do |s|
   s.files       = ["lib/glug.rb", "lib/glug/condition.rb", "lib/glug/extensions.rb", "lib/glug/layer.rb", "lib/glug/stylesheet.rb"]
   s.homepage    = 'http://github.com/systemed/glug'
   s.license     = 'FTWPL'
-  s.add_dependency 'neatjson'
   s.add_dependency 'chroma'
   s.add_dependency 'hsluv'
+  s.add_dependency 'neatjson'
   s.executables << 'glug'
 end
