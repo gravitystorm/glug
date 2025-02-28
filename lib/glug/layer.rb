@@ -65,7 +65,7 @@ module Glug # :nodoc:
       @cascades = args[:cascades] || []	# cascade list to apply to all subsequent layers
       @uncascaded = nil	# condition to add to non-cascaded layers
 
-      @kv[:source] ||= stylesheet.sources.find { |k, v| v[:default] }[0]
+      @kv[:source] ||= stylesheet.sources.find { |_k, v| v[:default] }[0]
       @kv[:source_layer] ||= args[:id] if stylesheet.sources[@kv[:source]][:type] == "vector"
       @child_num = 0	# incremented sublayer suffix
     end
@@ -110,7 +110,7 @@ module Glug # :nodoc:
     def on(*args, &block)
       @child_num += 1
       r = Layer.new(@stylesheet,
-                    :id => "#{@kv[:id]}__#{@child_num}".to_sym,
+                    :id => :"#{@kv[:id]}__#{@child_num}",
                     :kv => @kv.dup, :cascades => @cascades.dup)
 
       # Set zoom level
@@ -223,7 +223,8 @@ module Glug # :nodoc:
           set_type_from s
         elsif TOP_LEVEL.include?(k) || HIDDEN.include?(k)
           hash[s] = v
-        else raise "#{s} isn't a recognised layer attribute"
+        else
+          raise "#{s} isn't a recognised layer attribute"
         end
       end
 
