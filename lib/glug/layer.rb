@@ -75,7 +75,7 @@ module Glug # :nodoc:
     # otherwise it's an OSM key
     def method_missing(method_sym, *arguments)
       if EXPRESSIONS.include?(method_sym)
-        return Condition.new.from_list(method_sym, arguments)
+        Condition.new.from_list(method_sym, arguments)
       elsif LAYOUT.include?(method_sym) || PAINT.include?(method_sym) || TOP_LEVEL.include?(method_sym)
         v = arguments.length == 1 ? arguments[0] : arguments
         if v.is_a?(Proc) then v = v.call(@kv[method_sym]) end
@@ -85,7 +85,7 @@ module Glug # :nodoc:
           _add_cascade_condition(method_sym, v)
         end
       else
-        return Condition.new.from_list("get", [method_sym])
+        Condition.new.from_list("get", [method_sym])
       end
     end
 
@@ -191,8 +191,8 @@ module Glug # :nodoc:
     def write?; @write end
 
     # Square-bracket filters (any[...], all[...])
-    def any; return Subscriptable.new(:any) end
-    def all; return Subscriptable.new(:all) end
+    def any; Subscriptable.new(:any) end
+    def all; Subscriptable.new(:all) end
 
     # Deduce 'type' attribute from style attributes
     def set_type_from(s)
