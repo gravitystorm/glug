@@ -21,7 +21,7 @@ module Glug # :nodoc:
       @kv[method_sym] = arguments[0]
     end
 
-    # Add a source 
+    # Add a source
     def source(source_name, opts = {})
       @sources[source_name] = opts
     end
@@ -48,7 +48,7 @@ module Glug # :nodoc:
     def _add_layer(layer)
       @layers << layer
     end
-    
+
     # Load file
     def include_file(fn)
       instance_eval(File.read(File.join(@base_dir, fn)))

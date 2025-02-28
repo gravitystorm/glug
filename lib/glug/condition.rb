@@ -124,6 +124,5 @@ module Glug # :nodoc:
         end
       end
     end
-    
   end # class Condition
 end # module Glug

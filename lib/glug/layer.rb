@@ -7,17 +7,17 @@ module Glug # :nodoc:
   class Layer
 
     # GL properties (as distinct from OSM keys)
-    LAYOUT    = [ :visibility,
-                  :line_cap, :line_join, :line_miter_limit, :line_round_limit, 
+    LAYOUT    = [:visibility,
+                  :line_cap, :line_join, :line_miter_limit, :line_round_limit,
                   :symbol_placement, :symbol_spacing, :symbol_avoid_edges, :symbol_z_order,
                   :icon_allow_overlap, :icon_ignore_placement, :icon_optional, :icon_rotation_alignment, :icon_size,
-                  :icon_image, :icon_rotate, :icon_padding, :icon_keep_upright, :icon_offset, 
+                  :icon_image, :icon_rotate, :icon_padding, :icon_keep_upright, :icon_offset,
                   :icon_text_fit, :icon_text_fit_padding, :icon_anchor, :icon_pitch_alignment,
                   :text_rotation_alignment, :text_field, :text_font, :text_size, :text_max_width, :text_line_height,
                   :text_letter_spacing, :text_justify, :text_anchor, :text_max_angle, :text_rotate, :text_padding,
                   :text_keep_upright, :text_transform, :text_offset, :text_allow_overlap, :text_ignore_placement, :text_optional,
-                  :text_pitch_alignment ]
-    PAINT     = [ :background_color, :background_pattern, :background_opacity,
+                  :text_pitch_alignment]
+    PAINT     = [:background_color, :background_pattern, :background_opacity,
                   :fill_antialias, :fill_opacity, :fill_color, :fill_outline_color, :fill_translate, :fill_translate_anchor, :fill_pattern,
                   :line_opacity, :line_color, :line_translate, :line_translate_anchor, :line_width, :line_gap_width, :line_offset,
                   :line_blur, :line_dasharray, :line_pattern, :line_gradient,
@@ -28,12 +28,12 @@ module Glug # :nodoc:
                   :circle_pitch_scale, :circle_pitch_alignment, :circle_stroke_width, :circle_stroke_color, :circle_stroke_opacity,
                   :fill_extrusion_opacity, :fill_extrusion_color, :fill_extrusion_translate, :fill_extrusion_translate_anchor,
                   :fill_extrusion_pattern, :fill_extrusion_height, :fill_extrusion_base, :fill_extrusion_vertical_gradient,
-                  :heatmap_radius, :heatmap_weight, :heatmap_intensity, :heatmap_color, :heatmap_opacity, 
+                  :heatmap_radius, :heatmap_weight, :heatmap_intensity, :heatmap_color, :heatmap_opacity,
                   :hillshade_illumination_direction, :hillshade_illumination_anchor, :hillshade_exaggeration,
-                  :hillshade_shadow_color, :hillshade_highlight_color, :hillshade_accent_color ]
-    TOP_LEVEL = [ :metadata, :zoom, :interactive ]
-    HIDDEN    = [ :ref, :source, :source_layer, :id, :type, :filter, :layout, :paint ]	# top level, not settable by commands
-    EXPRESSIONS = [ :array, :boolean, :collator, :string_format, :image, :literal, :number,
+                  :hillshade_shadow_color, :hillshade_highlight_color, :hillshade_accent_color]
+    TOP_LEVEL = [:metadata, :zoom, :interactive]
+    HIDDEN    = [:ref, :source, :source_layer, :id, :type, :filter, :layout, :paint]	# top level, not settable by commands
+    EXPRESSIONS = [:array, :boolean, :collator, :string_format, :image, :literal, :number,
                   :number_format, :object, :string, :to_boolean, :to_color, :to_number, :to_string,
                   :typeof, :accumulated, :feature_state, :geometry_type, :feature_id,
                   :line_progress, :properties, :at, :get, :has, :is_in, :index_of,
@@ -45,9 +45,9 @@ module Glug # :nodoc:
             :rgb, :rgba, :to_rgba, :abs, :acos, :asin, :atan, :ceil, :cos, :distance,
             :e, :floor, :ln, :ln2, :log10, :log2, :max, :min, :pi, :round, :sin, :sqrt, :tan,
             :distance_from_center, :pitch, :zoom, :heatmap_density,
-            :subtract, :divide, :pow, :_! ]
+            :subtract, :divide, :pow, :_!]
 
-    # Shared properties that can be recalled by using a 'ref' 
+    # Shared properties that can be recalled by using a 'ref'
     REF_PROPERTIES = ['type', 'source', 'source-layer', 'minzoom', 'maxzoom', 'filter', 'layout']
 
     attr_accessor :kv	# key-value pairs for layout, paint, and top level
@@ -67,7 +67,7 @@ module Glug # :nodoc:
       @cascades = args[:cascades] || []	# cascade list to apply to all subsequent layers
       @uncascaded = nil	# condition to add to non-cascaded layers
 
-      @kv[:source] ||= stylesheet.sources.find {|k, v| v[:default] }[0]
+      @kv[:source] ||= stylesheet.sources.find { |k, v| v[:default] }[0]
       @kv[:source_layer] ||= args[:id] if stylesheet.sources[@kv[:source]][:type] == "vector"
       @child_num = 0	# incremented sublayer suffix
     end
@@ -143,7 +143,7 @@ module Glug # :nodoc:
         child_chr.next!
       end
     end
-    
+
     # Nil-safe merge
     def nilsafe_merge(a, b)
       a.nil? ? b : (a & b)
@@ -184,14 +184,14 @@ module Glug # :nodoc:
     def id(name)
       @kv[:id] = name
     end
-    
+
     # Suppress output of this layer
     def suppress; @write = false end
     def write?; @write end
 
     # Square-bracket filters (any[...], all[...])
-    def any; return Subscriptable.new(:any ) end
-    def all; return Subscriptable.new(:all ) end
+    def any; return Subscriptable.new(:any) end
+    def all; return Subscriptable.new(:all) end
 
     # Deduce 'type' attribute from style attributes
     def set_type_from(s)
@@ -254,7 +254,7 @@ module Glug # :nodoc:
 
     # Key to identify matching layer properties (slow but...)
     def ref_key(hash)
-      (REF_PROPERTIES.collect { |k| hash[k] } ).to_json
+      (REF_PROPERTIES.collect { |k| hash[k] }).to_json
     end
 
   end # class Layer
