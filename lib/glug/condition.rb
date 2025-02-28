@@ -6,7 +6,7 @@ module Glug # :nodoc:
 
   class Subscriptable
     def initialize(type)
-      @type=type
+      @type = type
     end
     def [](*arguments)
       Condition.new.from_list(@type, arguments)
@@ -57,7 +57,7 @@ module Glug # :nodoc:
     def coerce(other); [Condition.new.just_value(other), self] end
 
     def initialize
-      @values=[]
+      @values = []
     end
     def from_key(operator, key, list)
       @operator = SUBSTITUTIONS[operator] || operator.to_s.gsub('_','-')
@@ -80,9 +80,9 @@ module Glug # :nodoc:
     def merge(op,cond)
       if cond.nil?
         self
-      elsif @operator==op
+      elsif @operator == op
         Condition.new.from_list(op, @values + [cond])
-      elsif cond.operator==op
+      elsif cond.operator == op
         Condition.new.from_list(op, [self] + cond.values)
       else
         Condition.new.from_list(op, [self, cond])

@@ -33,7 +33,7 @@ module Glug # :nodoc:
                   :hillshade_shadow_color, :hillshade_highlight_color, :hillshade_accent_color ]
     TOP_LEVEL = [ :metadata, :zoom, :interactive ]
     HIDDEN    = [ :ref, :source, :source_layer, :id, :type, :filter, :layout, :paint ]	# top level, not settable by commands
-    EXPRESSIONS=[ :array, :boolean, :collator, :string_format, :image, :literal, :number,
+    EXPRESSIONS = [ :array, :boolean, :collator, :string_format, :image, :literal, :number,
                   :number_format, :object, :string, :to_boolean, :to_color, :to_number, :to_string,
                   :typeof, :accumulated, :feature_state, :geometry_type, :feature_id,
                   :line_progress, :properties, :at, :get, :has, :is_in, :index_of,
@@ -59,7 +59,7 @@ module Glug # :nodoc:
       @condition = args[:condition]
       @kv = args[:kv] || {}
       @kv[:id] = args[:id]
-      if args[:zoom] then @kv[:zoom]=args[:zoom] end
+      if args[:zoom] then @kv[:zoom] = args[:zoom] end
 
       @type = nil							# auto-detected layer type
       @write = true						# write this layer out, or has it been suppressed?
@@ -68,7 +68,7 @@ module Glug # :nodoc:
       @uncascaded = nil					# condition to add to non-cascaded layers
 
       @kv[:source] ||= stylesheet.sources.find {|k,v| v[:default] }[0]
-      @kv[:source_layer] ||= args[:id] if stylesheet.sources[@kv[:source]][:type]=="vector"
+      @kv[:source_layer] ||= args[:id] if stylesheet.sources[@kv[:source]][:type] == "vector"
       @child_num = 0				# incremented sublayer suffix
     end
 
@@ -79,8 +79,8 @@ module Glug # :nodoc:
       if EXPRESSIONS.include?(method_sym)
         return Condition.new.from_list(method_sym, arguments)
       elsif LAYOUT.include?(method_sym) || PAINT.include?(method_sym) || TOP_LEVEL.include?(method_sym)
-        v = arguments.length==1 ? arguments[0] : arguments
-        if v.is_a?(Proc) then v=v.call(@kv[method_sym]) end
+        v = arguments.length == 1 ? arguments[0] : arguments
+        if v.is_a?(Proc) then v = v.call(@kv[method_sym]) end
         if @cascade_cond.nil?
           @kv[method_sym] = v
         else
@@ -93,7 +93,7 @@ module Glug # :nodoc:
 
     # Convenience so we can write literal(1,2,3) rather than literal([1,2,3])
     def literal(*args)
-      if args.length==1 && args[0].is_a?(Hash)
+      if args.length == 1 && args[0].is_a?(Hash)
         # Hashes - literal(frog: 1, bill: 2)
         Condition.new.from_list(:literal, [args[0]])
       else
@@ -110,7 +110,7 @@ module Glug # :nodoc:
 
     # Add a sublayer with an additional filter
     def on(*args, &block)
-      @child_num+=1
+      @child_num += 1
       r = Layer.new(@stylesheet,
           :id => "#{@kv[:id]}__#{@child_num}".to_sym,
           :kv => @kv.dup, :cascades => @cascades.dup)
@@ -125,7 +125,7 @@ module Glug # :nodoc:
       if args.empty?
         sub_cond = @condition						# just inherit parent layer's condition
       else
-        sub_cond = (args.length==1) ? args[0] : Condition.new.from_list(:any,args)
+        sub_cond = (args.length == 1) ? args[0] : Condition.new.from_list(:any,args)
         sub_cond = nilsafe_merge(sub_cond, @condition)
       end
       r._set_filter(nilsafe_merge(sub_cond, @uncascaded))
@@ -133,10 +133,10 @@ module Glug # :nodoc:
       @stylesheet._add_layer(r)
 
       # Create cascaded layers
-      child_chr='a'
+      child_chr = 'a'
       @cascades.each do |c|
         c_cond, c_kv = c
-        l = Layer.new(@stylesheet, :id=>"#{r.kv[:id]}__#{child_chr}", :kv=>r.kv.dup)
+        l = Layer.new(@stylesheet, :id => "#{r.kv[:id]}__#{child_chr}", :kv => r.kv.dup)
         l._set_filter(nilsafe_merge(sub_cond, c_cond))
         l.kv.merge!(c_kv)
         @stylesheet._add_layer(l)
@@ -151,16 +151,16 @@ module Glug # :nodoc:
 
     # Add a cascading condition
     def cascade(*args, &block)
-      cond = (args.length==1) ? args[0] : Condition.new.from_list(:any,args)
+      cond = (args.length == 1) ? args[0] : Condition.new.from_list(:any,args)
       @cascade_cond = cond
       self.instance_eval(&block)
       @cascade_cond = nil
     end
     def _add_cascade_condition(k, v)
-      if @cascades.length>0 && @cascades[-1][0].to_s==@cascade_cond.to_s
-        @cascades[-1][1][k]=v
+      if @cascades.length > 0 && @cascades[-1][0].to_s == @cascade_cond.to_s
+        @cascades[-1][1][k] = v
       else
-        @cascades << [@cascade_cond, { k=>v }]
+        @cascades << [@cascade_cond, { k => v }]
       end
     end
     def uncascaded(*args)
@@ -174,7 +174,7 @@ module Glug # :nodoc:
 
     # Setters for @condition (making sure we copy when inheriting)
     def filter(*args)
-      _set_filter(args.length==1 ? args[0] : Condition.new.from_list(:any,args))
+      _set_filter(args.length == 1 ? args[0] : Condition.new.from_list(:any,args))
     end
     def _set_filter(condition)
       @condition = condition.nil? ? nil : condition.dup
@@ -196,30 +196,30 @@ module Glug # :nodoc:
     # Deduce 'type' attribute from style attributes
     def set_type_from(s)
       return unless s.include?('-')
-      t = (s=~/^fill-extrusion/ ? "fill-extrusion" : s.split('-')[0]).to_sym
-      if t==:icon || t==:text then t=:symbol end
-      if @type && @type!=t then raise "Attribute #{s} conflicts with deduced type #{@type} in layer #{@kv[:id]}" end
-      @type=t
+      t = (s =~ /^fill-extrusion/ ? "fill-extrusion" : s.split('-')[0]).to_sym
+      if t == :icon || t == :text then t = :symbol end
+      if @type && @type != t then raise "Attribute #{s} conflicts with deduced type #{@type} in layer #{@kv[:id]}" end
+      @type = t
     end
 
     # Create a GL-format hash from a layer definition
     def to_hash
-      hash = { :layout=> {}, :paint => {} }
+      hash = { :layout => {}, :paint => {} }
 
       # Assign key/values to correct place
       @kv.each do |k,v|
         s = k.to_s.gsub('_','-')
         if s.include?('-color') && v.is_a?(Integer) then v = "#%06x" % v end
-        if v.respond_to?(:encode) then v=v.encode end
+        if v.respond_to?(:encode) then v = v.encode end
 
         if LAYOUT.include?(k)
-          hash[:layout][s]=v
+          hash[:layout][s] = v
           set_type_from s
         elsif PAINT.include?(k)
-          hash[:paint][s]=v
+          hash[:paint][s] = v
           set_type_from s
         elsif TOP_LEVEL.include?(k) || HIDDEN.include?(k)
-          hash[s]=v
+          hash[s] = v
         else raise "#{s} isn't a recognised layer attribute"
         end
       end
@@ -228,7 +228,7 @@ module Glug # :nodoc:
       if @condition then hash['filter'] = @condition.encode end
 
       # Convert zoom level
-      if (v=hash['zoom'])
+      if (v = hash['zoom'])
         hash['minzoom'] = v.is_a?(Range) ? v.first : v
         hash['maxzoom'] = v.is_a?(Range) ? v.last  : v
         hash.delete('zoom')
