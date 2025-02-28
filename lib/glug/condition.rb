@@ -93,7 +93,10 @@ module Glug # :nodoc:
       end
     end
 
-    def <<(cond); @values << cond.encode; self end
+    def <<(cond)
+      @values << cond.encode
+      self
+    end
 
     # Support dot access for most methods
     def method_missing(method_sym, *args)
