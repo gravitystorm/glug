@@ -13,8 +13,8 @@ Glug is a compiler. You should use it to generate JSON, then serve that JSON wit
 ```ruby
 version 8
 name "My first stylesheet"
-source :osm_data, type: 'vector', url: 'http://my-server.com/osm.tilejson'
- 
+source :osm_data, type: 'vector', url: 'http://example.com/osm.tilejson'
+
 layer(:roads, zoom: 10..13, source: :osm_data) {
     line_width 6
     line_color 0x888888

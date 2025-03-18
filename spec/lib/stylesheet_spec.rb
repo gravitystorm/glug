@@ -11,7 +11,7 @@ describe Glug::Stylesheet do
     json = Glug::Stylesheet.new do
       version 8
       name 'My first stylesheet'
-      source :osm_data, type: 'vector', url: 'http://my-server.com/osm.tilejson'
+      source :osm_data, type: 'vector', url: 'http://example.com/osm.tilejson'
 
       layer(:roads, zoom: 10..13, source: :osm_data) do
         line_width 6
@@ -27,7 +27,7 @@ describe Glug::Stylesheet do
       {
         "version":8,
         "name":"My first stylesheet",
-        "sources":{"osm_data":{"type":"vector","url":"http://my-server.com/osm.tilejson"}},
+        "sources":{"osm_data":{"type":"vector","url":"http://example.com/osm.tilejson"}},
         "layers":[
           {
             "paint":{"line-width":6,"line-color":"#888888"},
