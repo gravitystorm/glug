@@ -198,7 +198,7 @@ module Glug # :nodoc:
     def set_type_from(s)
       return unless s.include?('-')
 
-      t = (s =~ /^fill-extrusion/ ? "fill-extrusion" : s.split('-')[0]).to_sym
+      t = (/^fill-extrusion/.match?(s) ? "fill-extrusion" : s.split('-')[0]).to_sym
       if t == :icon || t == :text then t = :symbol end
       if @type && @type != t then raise "Attribute #{s} conflicts with deduced type #{@type} in layer #{@kv[:id]}" end
 
@@ -211,7 +211,7 @@ module Glug # :nodoc:
 
       # Assign key/values to correct place
       @kv.each do |k, v|
-        s = k.to_s.gsub('_', '-')
+        s = k.to_s.tr('_', '-')
         if s.include?('-color') && v.is_a?(Integer) then v = "#%06x" % v end
         if v.respond_to?(:encode) then v = v.encode end
 
