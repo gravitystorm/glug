@@ -4,7 +4,14 @@ source "https://rubygems.org"
 
 # gem "rails"
 
-gem "rspec", "~> 3.13", group: :test
-gem "rubocop", "~> 1.73", groups: [:development, :test]
+group :development, :test do
+  gem "rubocop", require: false
+  gem "rubocop-performance", require: false
+  gem "rubocop-rspec", require: false
+end
+
+group :test do
+  gem "rspec", "~> 3.13"
+end
 
 gemspec
