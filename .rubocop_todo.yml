@@ -102,6 +102,7 @@ RSpec/SpecFilePathFormat:
   Exclude:
     - '**/spec/routing/**/*'
     - 'spec/lib/stylesheet_spec.rb'
+    - 'spec/lib/layer_spec.rb'
 
 # Offense count: 3
 # This cop supports safe autocorrection (--autocorrect).
@@ -170,6 +171,7 @@ Style/FrozenStringLiteralComment:
     - 'lib/glug/layer.rb'
     - 'lib/glug/stylesheet.rb'
     - 'spec/lib/stylesheet_spec.rb'
+    - 'spec/lib/layer_spec.rb'
     - 'spec/spec_helper.rb'
 
 # Offense count: 8
