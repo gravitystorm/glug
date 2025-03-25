@@ -48,6 +48,10 @@ module Glug # :nodoc:
     # Shared properties that can be recalled by using a 'ref'
     REF_PROPERTIES = ['type', 'source', 'source-layer', 'minzoom', 'maxzoom', 'filter', 'layout']
 
+    # Taken from the Maplibre style spec and used for endless ranges
+    MINZOOM = 0
+    MAXZOOM = 24
+
     attr_accessor :kv	# key-value pairs for layout, paint, and top level
     attr_accessor :condition	# filter condition
     attr_accessor :stylesheet	# parent stylesheet object
@@ -233,8 +237,12 @@ module Glug # :nodoc:
 
       # Convert zoom level
       if (v = hash['zoom'])
-        hash['minzoom'] = v.is_a?(Range) ? v.first : v
-        hash['maxzoom'] = v.is_a?(Range) ? v.last  : v
+        if v.is_a?(Range)
+          hash['minzoom'] = v.begin.nil? ? MINZOOM : v.first
+          hash['maxzoom'] = v.end.nil? ? MAXZOOM : v.last
+        else
+          hash['minzoom'] = hash['maxzoom'] = v
+        end
         hash.delete('zoom')
       end
 
