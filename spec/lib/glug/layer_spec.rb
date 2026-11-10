@@ -54,4 +54,36 @@ describe Glug::Layer do
       end
     end
   end
+
+  describe 'type deduction' do
+    def layer_with(properties)
+      stylesheet = Glug::Stylesheet.new do
+        source :osm_data, type: 'vector', url: 'http://example.com/osm.tilejson', default: true
+      end
+      layer = described_class.new(stylesheet, { id: :test })
+      properties.each { |k, v| layer.add_property(k, v) }
+      layer
+    end
+
+    {
+      { line_width: 1 } => :line,
+      { icon_size: 1, text_color: 'red' } => :symbol,
+      { fill_extrusion_rounded_corner_distance: 1 } => :"fill-extrusion",
+      { color_relief_opacity: 0.5 } => :"color-relief",
+      { resampling: 'nearest', raster_opacity: 0.5 } => :raster,
+      { hillshade_method: 'standard', resampling: 'nearest' } => :hillshade
+    }.each do |properties, type|
+      it "deduces #{type} from #{properties.keys.join(', ')}" do
+        expect(layer_with(properties).to_hash['type']).to eq(type)
+      end
+    end
+
+    it 'raises if properties belong to different layer types' do
+      expect { layer_with(line_width: 1, fill_color: 'red').to_hash }.to raise_error(/conflicts/)
+    end
+
+    it 'leaves the type unset if the properties are valid for several layer types' do
+      expect(layer_with(visibility: 'none').to_hash['type']).to be_nil
+    end
+  end
 end

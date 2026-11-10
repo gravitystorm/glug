@@ -25,6 +25,12 @@ module Glug # :nodoc:
     # GL properties (as distinct from OSM keys), from the MapLibre style spec
     LAYOUT    = StyleSpec::LAYOUT.values.flatten.uniq.map { |name| property_method(name) }.freeze
     PAINT     = StyleSpec::PAINT.values.flatten.uniq.map { |name| property_method(name) }.freeze
+    # Layer types each property is valid for, e.g. "resampling" => [:raster, :hillshade, :"color-relief"]
+    PROPERTY_TYPES = {}.tap do |types|
+      [StyleSpec::LAYOUT, StyleSpec::PAINT].each do |groups|
+        groups.each { |type, names| names.each { |name| types[name] = (types[name] || []) | [type.to_sym] } }
+      end
+    end.freeze
     TOP_LEVEL = %i[metadata zoom interactive].freeze
     HIDDEN    = %i[source source_layer id type filter layout paint].freeze	# top level, not settable by commands
     EXPRESSIONS = ((StyleSpec::EXPRESSIONS - OPERATOR_EXPRESSIONS).map { |name| expression_method(name) } +
@@ -46,6 +52,7 @@ module Glug # :nodoc:
       @kv[:zoom] = args[:zoom] if args[:zoom]
 
       @type = nil	# auto-detected layer type
+      @types = nil	# layer types consistent with the properties set so far
       @write = true	# write this layer out, or has it been suppressed?
       @cascade_cond = nil	# are we currently evaluating a cascade directive?
       @cascades = args[:cascades] || []	# cascade list to apply to all subsequent layers
@@ -211,17 +218,14 @@ module Glug # :nodoc:
 
     # Deduce 'type' attribute from style attributes
     def set_type_from(property)
-      return unless property.include?('-')
-
-      new_type = (/^fill-extrusion/.match?(property) ? 'fill-extrusion' : 
-                  /^color-relief/.match?(property) ? 'color-relief' : 
-                  property.split('-')[0]).to_sym
-      new_type = :symbol if %i[icon text].include?(new_type)
-      if @type && @type != new_type
-        raise "Attribute #{property} conflicts with deduced type #{@type} in layer #{@kv[:id]}"
+      types = PROPERTY_TYPES.fetch(property)
+      candidates = @types ? @types & types : types
+      if candidates.empty?
+        raise "Attribute #{property} conflicts with deduced type #{@types.join(' or ')} in layer #{@kv[:id]}"
       end
 
-      @type = new_type
+      @types = candidates
+      @type = (candidates.first if candidates.size == 1)
     end
 
     # Create a GL-format hash from a layer definition
