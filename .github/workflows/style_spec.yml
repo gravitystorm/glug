@@ -1,0 +1,68 @@
+name: Style spec update
+# Opens (or refreshes) a pull request when a new release of the MapLibre style spec is published.
+#
+# Requires "Allow GitHub Actions to create and approve pull requests" in the repository's
+# Settings > Actions > General. Pull requests created with the default GITHUB_TOKEN don't
+# trigger the other workflows, so the test results are included in the pull request instead.
+on:
+  schedule:
+    - cron: '23 5 * * 1'
+  workflow_dispatch:
+permissions:
+  contents: write
+  pull-requests: write
+env:
+  ruby: '4.0'
+jobs:
+  update:
+    name: Update style spec
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v4
+    - name: Setup ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{ env.ruby }}
+        rubygems: 3.4.10
+        bundler-cache: true
+    - name: Regenerate lib/glug/style_spec.rb
+      id: update
+      run: |
+        script/update_style_spec
+        echo "version=$(ruby -r ./lib/glug/style_spec -e 'puts Glug::StyleSpec::VERSION')" >> "$GITHUB_OUTPUT"
+    - name: Run rspec
+      id: rspec
+      continue-on-error: true
+      run: bundle exec rspec 2>&1 | tee rspec.txt; exit "${PIPESTATUS[0]}"
+    - name: Run rubocop
+      id: rubocop
+      continue-on-error: true
+      run: bundle exec rubocop 2>&1 | tee rubocop.txt; exit "${PIPESTATUS[0]}"
+    - name: Write pull request description
+      run: |
+        {
+          echo "Regenerated \`lib/glug/style_spec.rb\` from @maplibre/maplibre-gl-style-spec ${{ steps.update.outputs.version }} with \`script/update_style_spec\`."
+          echo
+          echo "Check that any new property or expression names won't shadow OSM keys used in existing stylesheets,"
+          echo "and that new expressions which aren't valid Ruby method names are mapped in \`Condition::SUBSTITUTIONS\`."
+          echo
+          echo "- rspec: ${{ steps.rspec.outcome }}"
+          echo "- rubocop: ${{ steps.rubocop.outcome }}"
+          echo
+          echo '<details><summary>rspec output</summary>'
+          echo
+          echo '```'
+          tail -n 50 rspec.txt
+          echo '```'
+          echo '</details>'
+        } > "$RUNNER_TEMP/pr_body.md"
+        rm rspec.txt rubocop.txt
+    - name: Create pull request
+      uses: peter-evans/create-pull-request@v7
+      with:
+        branch: style-spec-update
+        add-paths: lib/glug/style_spec.rb
+        commit-message: Update MapLibre style spec to ${{ steps.update.outputs.version }}
+        title: Update MapLibre style spec to ${{ steps.update.outputs.version }}
+        body-path: ${{ runner.temp }}/pr_body.md

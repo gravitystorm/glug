@@ -289,6 +289,8 @@ Bug reports, suggestions and (especially!) pull requests are very welcome on the
 
 Formatting: Run `bundle exec rubocop` to check formatting. Please be conservative about adding dependencies.
 
+Style spec: the lists of layer properties and expressions in `lib/glug/style_spec.rb` are generated from the [MapLibre style spec](https://github.com/maplibre/maplibre-style-spec). Don't edit that file by hand. Run `script/update_style_spec` (optionally with a release version) to regenerate it. A scheduled GitHub Action opens a pull request when a new release is published.
+
 ## Copyright and contact
 
 Richard Fairhurst, 2022. This code is licensed as FTWPL; you may do anything you like with this code and there is no warranty.
