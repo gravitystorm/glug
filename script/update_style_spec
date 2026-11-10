@@ -1,0 +1,82 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Regenerates lib/glug/style_spec.rb from a published release of the MapLibre style spec,
+# so that glug's list of layer properties and expressions tracks upstream.
+#
+#   script/update_style_spec            # latest release
+#   script/update_style_spec 26.6.0     # a specific release
+
+require 'digest'
+require 'json'
+require 'net/http'
+require 'rubygems/package'
+require 'stringio'
+require 'zlib'
+
+PACKAGE = '@maplibre/maplibre-gl-style-spec'
+SPEC_PATH = 'package/dist/latest.json'
+OUTPUT = File.expand_path('../lib/glug/style_spec.rb', __dir__)
+
+def fetch(url)
+  response = Net::HTTP.get_response(URI(url))
+  raise "GET #{url} failed: #{response.code} #{response.message}" unless response.is_a?(Net::HTTPSuccess)
+
+  response.body
+end
+
+def download_spec(version)
+  metadata = JSON.parse(fetch("https://registry.npmjs.org/#{PACKAGE}/#{version}"))
+  tarball = fetch(metadata['dist']['tarball'])
+  expected = metadata['dist']['integrity'].delete_prefix('sha512-')
+  unless Digest::SHA512.base64digest(tarball) == expected
+    raise "Integrity check failed for #{PACKAGE}@#{metadata['version']}"
+  end
+
+  Gem::Package::TarReader.new(Zlib::GzipReader.new(StringIO.new(tarball))) do |tar|
+    entry = tar.find { |e| e.full_name == SPEC_PATH }
+    raise "#{SPEC_PATH} not found in #{PACKAGE}@#{metadata['version']}" unless entry
+
+    return [metadata['version'], JSON.parse(entry.read)]
+  end
+end
+
+# e.g. { 'fill' => ['fill-antialias', ...], 'line' => [...] }
+def property_groups(spec, kind)
+  spec[kind].to_h { |group| [group.delete_prefix("#{kind}_"), spec[group].keys] }
+end
+
+def word_list(words, indent)
+  "%w[\n#{words.map { |w| "#{' ' * (indent + 2)}#{w}\n" }.join}#{' ' * indent}]"
+end
+
+def hash_constant(name, groups)
+  entries = groups.map { |type, props| "      '#{type}' => #{word_list(props, 6)}" }
+  "    #{name} = {\n#{entries.join(",\n")}\n    }.each_value(&:freeze).freeze"
+end
+
+def render(version, spec)
+  <<~RUBY
+    # frozen_string_literal: true
+
+    # GENERATED FILE - do not edit by hand. Regenerate with script/update_style_spec
+    # Source: #{PACKAGE}@#{version}
+
+    module Glug # :nodoc:
+      # Names from the MapLibre style spec, exactly as upstream spells them
+      module StyleSpec # rubocop:disable Metrics/ModuleLength
+        VERSION = '#{version}'
+
+    #{hash_constant('LAYOUT', property_groups(spec, 'layout'))}
+
+    #{hash_constant('PAINT', property_groups(spec, 'paint'))}
+
+        EXPRESSIONS = #{word_list(spec['expression_name']['values'].keys, 4)}.freeze
+      end
+    end
+  RUBY
+end
+
+version, spec = download_spec(ARGV.fetch(0, 'latest'))
+File.write(OUTPUT, render(version, spec))
+puts "Wrote #{OUTPUT} from #{PACKAGE}@#{version}"
